@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="jv" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petualangan Aksara Jawa - Kelas XII</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        javanese: {
+                            dark: '#1C0D08',
+                            brown: '#3E2723',
+                            med: '#5D4037',
+                            light: '#8D6E63',
+                            cream: '#FFF8E7',
+                            card: '#FFFDF7',
+                            gold: '#D4AF37',
+                            goldBright: '#FFD700',
+                            navy: '#0D1B2A',
+                            accent: '#C62828',
+                            emerald: '#1B5E20'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        serif: ['Cinzel', 'serif'],
+                        aksara: ['Noto Sans Javanese', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Noto+Sans+Javanese:wght@400;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1C0D08;
+            background-image: 
+                radial-gradient(#3E2723 1.5px, transparent 1.5px), 
+                radial-gradient(#3E2723 1.5px, #1C0D08 1.5px);
+            background-size: 36px 36px;
+            background-position: 0 0, 18px 18px;
+            color: #2C1810;
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        .aksara-text {
+            font-family: 'Noto Sans Javanese', serif;
+            line-height: 1.7;
+        }
+
+        .font-cinzel {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Javanese Ornamental Borders & Shadows */
+        .batik-border {
+            border: 3px solid #D4AF37;
+            box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(212, 175, 55, 0.25);
+        }
+
+        .gold-glow {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.45);
+        }
+
+        .card-hover {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.35);
+        }
+
+        /* Pulse Animation for CTA Buttons */
+        @keyframes pulse-gold {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
+            50% { transform: scale(1.03); box-shadow: 0 0 25px rgba(255, 215, 0, 0.85); }
+        }
+
+        .pulse-btn {
+            animation: pulse-gold 2s infinite;
+        }
+
+        /* Shake animation on wrong answer */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1C0D08;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #5D4037;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D4AF37;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-stone-800 antialiased overflow-x-hidden selection:bg-amber-200 selection:text-amber-900">
+
+    <!-- TOP HEADER / NAV -->
+    <header class="bg-javanese-dark/95 border-b border-javanese-gold/30 sticky top-0 z-40 backdrop-blur-md px-4 py-3 text-javanese-cream shadow-xl">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="showScreen('screenWelcome')">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-javanese-gold to-yellow-200 flex items-center justify-center text-javanese-dark font-extrabold text-2xl shadow-md border border-amber-200">
+                    ꦗ
+                </div>
+                <div>
+                    <h1 class="font-cinzel text-base sm:text-lg md:text-xl font-black text-javanese-goldBright tracking-wide">PETUALANGAN AKSARA JAWA</h1>
+                    <p class="text-xs text-amber-200/80 font-medium">Kelas XII SMA • Sinau Kanthi Dolanan</p>
+                </div>
+            </div>
+
+            <!-- Stats Bar (Hidden on Welcome/Result) -->
+            <div id="topStatsBar" class="hidden flex items-center flex-wrap gap-2 sm:gap-3 text-xs md:text-sm">
+                <div class="bg-javanese-brown/90 border border-amber-600/40 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-inner" title="Skor Saat Ini">
+                    <span class="text-base">⭐</span>
+                    <span id="statScore" class="font-black text-amber-300">0</span>
+                </div>
+                <div class="bg-javanese-brown/90 border border-amber-600/40 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-inner" title="Sisa Nyawa">
+                    <span id="statLives" class="text-base text-red-500 tracking-tighter">❤️❤️❤️</span>
+                </div>
+                <div class="bg-javanese-brown/90 border border-amber-600/40 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-inner" title="Level Saat Ini">
+                    <span class="text-base">🏆</span>
+                    <span class="text-amber-200 font-bold">Lvl <span id="statLevel">1</span>/6</span>
+                </div>
+                <div class="bg-javanese-brown/90 border border-amber-600/40 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-inner" title="Waktu Berjalan">
+                    <span class="text-base">⏱️</span>
+                    <span id="statTimer" class="font-mono text-amber-300 font-bold">00:00</span>
+                </div>
+                <div class="bg-red-950/90 border border-red-500/50 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-inner text-red-200" title="Jumlah Pelanggaran Tab Switch">
+                    <span>⚠️</span>
+                    <span id="statViolations" class="font-bold">0/3</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Progress Bar -->
+        <div id="topProgressBarContainer" class="hidden w-full bg-stone-900 h-2 mt-2 rounded-full overflow-hidden border border-amber-900/40">
+            <div id="topProgressBar" class="bg-gradient-to-r from-amber-600 via-yellow-400 to-amber-300 h-full transition-all duration-500 w-0"></div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-5xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center">
+
+        <!-- SECTION 1: WELCOME SCREEN -->
+        <section id="screenWelcome" class="text-center py-6 my-auto">
+            <div class="bg-gradient-to-b from-javanese-brown via-javanese-dark to-black batik-border rounded-3xl p-6 sm:p-10 text-javanese-cream relative overflow-hidden shadow-2xl">
+                
+                <!-- Background Gunungan Decorative SVG -->
+                <div class="absolute opacity-10 -right-12 -bottom-16 pointer-events-none">
+                    <svg width="340" height="420" viewBox="0 0 100 150" fill="currentColor" class="text-amber-300">
+                        <polygon points="50,0 100,150 0,150" />
+                        <path d="M50 15 L85 135 L15 135 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="50" cy="75" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                </div>
+                <div class="absolute opacity-10 -left-12 -bottom-16 pointer-events-none transform -scale-x-100">
+                    <svg width="340" height="420" viewBox="0 0 100 150" fill="currentColor" class="text-amber-300">
+                        <polygon points="50,0 100,150 0,150" />
+                        <path d="M50 15 L85 135 L15 135 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </div>
+
+                <div class="inline-block bg-amber-500/20 text-amber-300 border border-amber-400/40 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider mb-4">
+                    ✨ Game Edukasi Bahasa Jawa Interaktif • Kelas XII
+                </div>
+
+                <h2 class="font-cinzel text-3xl sm:text-5xl font-black text-javanese-goldBright mb-2 drop-shadow-lg tracking-wide">
+                    PETUALANGAN AKSARA JAWA
+                </h2>
+                <p class="aksara-text text-2xl sm:text-4xl text-amber-200 my-4 font-bold">ꦱꦶꦤꦴꦈꦲꦏ꧀ꦱꦫꦗꦮꦏꦤ꧀ꦛꦶꦢꦺꦴꦭꦴꦤꦤ꧀</p>
+                <p class="text-sm sm:text-base text-amber-100/90 max-w-2xl mx-auto mb-8 font-light italic">
+                    "Sinau Aksara Jawa ora kudu angel. Uji kawruhmu bab Nglegena, Pasangan, Sandhangan, Murda, lan Angka Jawa kanthi game interaktif!"
+                </p>
+
+                <!-- Feature Highlights Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto mb-8 text-left text-xs sm:text-sm">
+                    <div class="bg-black/40 border border-amber-500/30 p-3.5 rounded-2xl backdrop-blur-sm">
+                        <div class="text-xl mb-1">📜 6 Level</div>
+                        <div class="text-amber-200/80">30 Soal Acak & Lengkap</div>
+                    </div>
+                    <div class="bg-black/40 border border-amber-500/30 p-3.5 rounded-2xl backdrop-blur-sm">
+                        <div class="text-xl mb-1">🎵 Web Audio</div>
+                        <div class="text-amber-200/80">Efek Suara Sintetis SFX</div>
+                    </div>
+                    <div class="bg-black/40 border border-amber-500/30 p-3.5 rounded-2xl backdrop-blur-sm">
+                        <div class="text-xl mb-1">🛡️ Anti-Cheat</div>
+                        <div class="text-amber-200/80">Fullscreen & Focus Guard</div>
+                    </div>
+                    <div class="bg-black/40 border border-amber-500/30 p-3.5 rounded-2xl backdrop-blur-sm">
+                        <div class="text-xl mb-1">📱 Guru Report</div>
+                        <div class="text-amber-200/80">Kirim WhatsApp & CSV</div>
+                    </div>
+                </div>
+
+                <button id="btnStartWelcome" onclick="sfx.playClick(); showScreen('screenIdentity')" class="pulse-btn bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-javanese-dark font-black text-lg sm:text-xl px-8 py-4 rounded-2xl shadow-2xl transition hover:opacity-95 active:scale-95">
+                    🚀 MULAI PETUALANGAN
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION 2: IDENTITY FORM SCREEN -->
+        <section id="screenIdentity" class="hidden my-auto max-w-md mx-auto w-full">
+            <div class="bg-javanese-cream batik-border rounded-3xl p-6 sm:p-8 shadow-2xl text-javanese-dark">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center text-3xl mx-auto mb-2 border-2 border-amber-400 text-javanese-brown shadow-inner">
+                        👤
+                    </div>
+                    <h3 class="font-cinzel text-2xl font-bold text-javanese-brown">IDENTITAS SISWA</h3>
+                    <p class="text-xs text-stone-600 mt-1">Isi data dhiri kanthi bener sadurunge miwiti game</p>
+                </div>
+
+                <form id="identityForm" onsubmit="handleIdentitySubmit(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-javanese-brown uppercase tracking-wider mb-1">Nama Lengkap Siswa</label>
+                        <input type="text" id="inputName" required placeholder="Tuladha: Budi Santoso" class="w-full px-4 py-3 rounded-xl border-2 border-amber-300 focus:border-amber-600 focus:outline-none bg-white text-stone-800 text-sm font-semibold shadow-sm">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-javanese-brown uppercase tracking-wider mb-1">Kelas (Teks Manual)</label>
+                            <input type="text" id="inputClass" required placeholder="Tuladha: XII MIPA 1" class="w-full px-4 py-3 rounded-xl border-2 border-amber-300 focus:border-amber-600 focus:outline-none bg-white text-stone-800 text-sm font-semibold shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-javanese-brown uppercase tracking-wider mb-1">No. Absen</label>
+                            <input type="number" id="inputAbsen" required min="1" max="60" placeholder="1-60" class="w-full px-4 py-3 rounded-xl border-2 border-amber-300 focus:border-amber-600 focus:outline-none bg-white text-stone-800 text-sm font-semibold shadow-sm">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full mt-4 bg-javanese-brown hover:bg-javanese-dark text-javanese-goldBright font-extrabold py-3.5 px-6 rounded-xl shadow-lg transition duration-200 flex items-center justify-center gap-2 active:scale-95">
+                        <span>Lanjut menyang Aturan</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- SECTION 3: RULES & INSTRUCTIONS SCREEN -->
+        <section id="screenRules" class="hidden my-auto max-w-xl mx-auto w-full">
+            <div class="bg-javanese-cream batik-border rounded-3xl p-6 sm:p-8 shadow-2xl text-javanese-dark">
+                <div class="text-center mb-4">
+                    <span class="text-4xl">📜</span>
+                    <h3 class="font-cinzel text-2xl font-bold text-javanese-brown mt-1">ATURAN & TATA TERTIB GAME</h3>
+                    <p class="text-xs text-stone-600">Waca kanthi tliti sadurunge miwiti ujian game!</p>
+                </div>
+
+                <div class="space-y-3 text-xs sm:text-sm text-stone-700 bg-amber-50/90 p-4 rounded-2xl border border-amber-300 mb-6 shadow-inner">
+                    <div class="flex items-start gap-2.5">
+                        <span class="bg-amber-200 text-amber-900 rounded-full w-5 h-5 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">1</span>
+                        <p><strong>6 Level Tantangan:</strong> Total 30 soal ngliputi Nglegena, Pasangan, Sandhangan, Murda, lan Angka Jawa.</p>
+                    </div>
+                    <div class="flex items-start gap-2.5">
+                        <span class="bg-red-200 text-red-900 rounded-full w-5 h-5 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">2</span>
+                        <p><strong>3 Nyawa (❤️❤️❤️):</strong> Saben salah njawab, nyawa suda 1. Yen nyawa entek, game bakal mandheg.</p>
+                    </div>
+                    <div class="flex items-start gap-2.5">
+                        <span class="bg-amber-200 text-amber-900 rounded-full w-5 h-5 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">3</span>
+                        <p><strong>System Anti-Cheating:</strong> Game bakal mlebu <strong>FULLSCREEN MODE</strong>. Pindhah tab utawa ngurangi fokus bakal dicathet minangka PELANGGARAN! (Maksimal 3 pelanggaran sadurunge terkunci PIN Guru <code>GURU123</code>).</p>
+                    </div>
+                    <div class="flex items-start gap-2.5">
+                        <span class="bg-green-200 text-green-900 rounded-full w-5 h-5 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">4</span>
+                        <p><strong>Laporan Asil:</strong> Ing pungkasan game, asil bisa dikirim langsung menyang Guru liwat WhatsApp.</p>
+                    </div>
+                </div>
+
+                <button onclick="sfx.playClick(); startGameAdventure()" class="pulse-btn w-full bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 hover:from-amber-700 hover:to-amber-600 text-white font-extrabold py-4 px-6 rounded-xl shadow-xl transition text-base tracking-wide flex items-center justify-center gap-2 active:scale-95">
+                    <i class="fa-solid fa-play"></i>
+                    <span>SANGGUP & MULAI GAME NOW</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION 4: GAMEPLAY SCREEN (LEVELS 1-6) -->
+        <section id="screenGame" class="hidden my-auto w-full">
+            <div class="bg-javanese-cream batik-border rounded-3xl p-5 sm:p-8 shadow-2xl relative">
+
+                <!-- Level Header Info -->
+                <div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-4 border-b border-amber-300/80">
+                    <div>
+                        <span id="levelBadge" class="bg-javanese-brown text-javanese-goldBright text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                            LEVEL 1: KENALAN AKSARA
+                        </span>
+                        <h3 id="questionTitle" class="font-cinzel text-lg sm:text-xl font-bold text-javanese-brown mt-1">
+                            Soal No. 1 / 5
+                        </h3>
+                    </div>
+                    <div id="streakBadge" class="bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                        🔥 Streak: <span id="streakCount" class="text-amber-700 font-extrabold">0</span>
+                    </div>
+                </div>
+
+                <!-- QUESTION AREA -->
+                <div id="questionContainer" class="min-h-[240px] flex flex-col justify-center">
+                    <!-- Dynamic Questions Rendered Here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: FINAL RESULT SCREEN -->
+        <section id="screenResult" class="hidden my-auto max-w-2xl mx-auto w-full py-4">
+            <div class="bg-javanese-cream batik-border rounded-3xl p-6 sm:p-8 shadow-2xl text-javanese-dark relative overflow-hidden">
+                <div class="text-center mb-6">
+                    <div class="inline-block text-5xl mb-1 animate-bounce">🎉</div>
+                    <h2 class="font-cinzel text-2xl sm:text-3xl font-black text-javanese-brown">SELAMAT! GAME WIS RAMPUNG!</h2>
+                    <p class="text-xs sm:text-sm text-stone-600 mt-1">Matur nuwun wis ngrampungake kabeh tantangan Aksara Jawa.</p>
+                </div>
+
+                <!-- RESULT CARD FOR TEACHER & STUDENT -->
+                <div class="bg-white border-2 border-amber-300 rounded-2xl p-4 sm:p-6 shadow-inner mb-6 font-mono text-xs sm:text-sm">
+                    <div class="text-center pb-3 border-b border-dashed border-amber-300 mb-3">
+                        <p class="font-extrabold text-base text-javanese-brown font-cinzel">🏆 HASIL GAME AKSARA JAWA</p>
+                        <p class="text-xs text-stone-500">Kelas XII SMA • Petualangan Aksara</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 text-stone-800 mb-4 font-sans text-xs sm:text-sm">
+                        <div><strong>Nama:</strong> <span id="resName" class="font-semibold">-</span></div>
+                        <div><strong>Kelas:</strong> <span id="resClass" class="font-semibold">-</span></div>
+                        <div><strong>No. Absen:</strong> <span id="resAbsen" class="font-semibold">-</span></div>
+                        <div><strong>Waktu:</strong> <span id="resTime" class="font-semibold">-</span></div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 bg-amber-50 p-3 rounded-xl text-center border border-amber-200 mb-4 font-sans">
+                        <div>
+                            <span class="block text-xs text-stone-500">Skor Akhir</span>
+                            <span id="resScore" class="text-2xl font-black text-amber-600">0</span>
+                        </div>
+                        <div>
+                            <span class="block text-xs text-stone-500">Benar / Salah</span>
+                            <span class="text-sm font-bold"><span id="resCorrect" class="text-green-600">0</span> / <span id="resWrong" class="text-red-600">0</span></span>
+                        </div>
+                        <div>
+                            <span class="block text-xs text-stone-500">Pelanggaran</span>
+                            <span id="resViolations" class="text-sm font-bold text-red-600">0</span>
+                        </div>
+                    </div>
+
+                    <div class="text-center pt-2 border-t border-dashed border-amber-300 font-sans">
+                        <p class="text-xs text-stone-500 uppercase font-bold">Grade & Status</p>
+                        <div id="resGrade" class="text-lg sm:text-xl font-extrabold text-javanese-brown my-1">
+                            Sangat Apik (95) 🏆
+                        </div>
+                        <p id="resMotivation" class="text-xs italic text-stone-600 mt-1">
+                            "Luar biasa! Pangertenmu marang Aksara Jawa wis apik banget! 🏆"
+                        </p>
+                    </div>
+                </div>
+
+                <!-- BADGES UNLOCKED -->
+                <div class="mb-6">
+                    <h4 class="font-cinzel text-xs font-bold text-javanese-brown uppercase tracking-wider mb-2 text-center">Badges & Prestasi Poin</h4>
+                    <div id="badgesContainer" class="flex flex-wrap justify-center gap-2">
+                        <!-- Badges dynamically inserted -->
+                    </div>
+                </div>
+
+                <!-- ACTION BUTTONS -->
+                <div class="space-y-3">
+                    <button onclick="sfx.playClick(); sendWhatsAppResult()" class="pulse-btn w-full bg-green-600 hover:bg-green-700 text-white font-black py-3.5 px-6 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-sm sm:text-base active:scale-95">
+                        <i class="fa-brands fa-whatsapp text-xl"></i>
+                        <span>📱 KIRIM HASIL KE GURU (WA)</span>
+                    </button>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="sfx.playClick(); resetGameSession()" class="bg-javanese-brown hover:bg-javanese-dark text-javanese-goldBright font-bold py-3 px-4 rounded-xl shadow transition text-xs sm:text-sm flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-rotate-right"></i>
+                            <span>MAIN LAGI</span>
+                        </button>
+                        <button onclick="sfx.playClick(); toggleTeacherModal()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-4 rounded-xl shadow transition text-xs sm:text-sm flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-user-tie"></i>
+                            <span>MODE GURU</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL 1: ANSWER FEEDBACK / EXPLANATION MODAL -->
+    <div id="modalFeedback" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div id="modalFeedbackBox" class="bg-javanese-cream border-2 border-amber-400 rounded-3xl max-w-md w-full p-6 shadow-2xl text-javanese-dark transform transition-all">
+            <div class="text-center mb-3">
+                <div id="feedbackIcon" class="text-5xl mb-2">🎉</div>
+                <h3 id="feedbackTitle" class="font-cinzel text-2xl font-bold">Bener Banget!</h3>
+            </div>
+            
+            <div id="feedbackBody" class="bg-white border border-amber-200 p-4 rounded-2xl text-xs sm:text-sm text-stone-700 mb-5 leading-relaxed">
+                <!-- Explanation text here -->
+            </div>
+
+            <button onclick="sfx.playClick(); closeFeedbackAndNext()" class="w-full bg-javanese-brown hover:bg-javanese-dark text-javanese-goldBright font-bold py-3 rounded-xl shadow transition active:scale-95">
+                Lanjut Soal Berikutnya ➔
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL 2: CHEATING / TAB SWITCH WARNING MODAL -->
+    <div id="modalWarning" class="hidden fixed inset-0 bg-red-950/90 z-50 flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-white border-4 border-red-600 rounded-3xl max-w-md w-full p-6 text-center shadow-2xl">
+            <div class="text-6xl mb-2 animate-bounce">⚠️</div>
+            <h3 class="font-cinzel text-2xl font-black text-red-600 mb-2">PERINGATAN VIOLATION!</h3>
+            <p class="text-xs sm:text-sm text-stone-700 mb-4 font-medium">
+                Sampeyan wis ninggalake halaman game / metu saka Fullscreen! Mangga bali lan fokus menyang game.
+            </p>
+            <div class="bg-red-50 border border-red-200 p-3 rounded-xl text-xs text-red-800 font-bold mb-5">
+                Jumlah Pelanggaran: <span id="warningCountText" class="text-base text-red-600 font-extrabold">1</span> / 3
+            </div>
+            <button onclick="sfx.playClick(); dismissWarningAndResume()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition active:scale-95">
+                Mbali menyang Game
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL 3: GAME LOCKED MODAL (3 VIOLATIONS) -->
+    <div id="modalLocked" class="hidden fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4">
+        <div class="bg-stone-900 border-2 border-red-500 rounded-3xl max-w-md w-full p-6 text-center shadow-2xl text-white">
+            <div class="text-6xl mb-3">🔒</div>
+            <h3 class="font-cinzel text-2xl font-bold text-red-500 mb-2">GAME TERKUNCI!</h3>
+            <p class="text-xs text-stone-300 mb-4">
+                Sampeyan wis nglanggar aturan kaping 3 (pindhah tab/metu game). Hubungi guru kanggo mbukak kunci iki nganggo PIN.
+            </p>
+            <div class="space-y-3">
+                <input type="password" id="inputTeacherPin" placeholder="Ketik PIN Guru (GURU123)" class="w-full px-4 py-3 rounded-xl bg-stone-800 border border-stone-600 text-white text-center text-sm focus:outline-none focus:border-red-500">
+                <button onclick="sfx.playClick(); unlockGameWithPin()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow transition text-sm active:scale-95">
+                    Buka Kunci Game
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: GAME OVER MODAL (0 LIVES) -->
+    <div id="modalGameOver" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+        <div class="bg-javanese-cream border-2 border-amber-400 rounded-3xl max-w-md w-full p-6 text-center shadow-2xl text-javanese-dark">
+            <div class="text-6xl mb-2">💔</div>
+            <h3 class="font-cinzel text-2xl font-extrabold text-red-700 mb-1">NYAWA HABIS!</h3>
+            <p class="text-xs text-stone-600 mb-4">Aja nyerah! Sinau luwih tliti maneh lan coba maneh tantangan iki.</p>
+            <button onclick="sfx.playClick(); restartFromGameOver()" class="w-full bg-javanese-brown hover:bg-javanese-dark text-javanese-goldBright font-bold py-3.5 rounded-xl shadow-lg transition active:scale-95">
+                🔄 Coba Maneh
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL 5: MODE GURU & DATA REKAP MODAL -->
+    <div id="modalTeacher" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl max-h-[90vh] flex flex-col text-stone-800">
+            <div class="flex items-center justify-between pb-3 border-b mb-4">
+                <h3 class="font-cinzel text-xl font-bold text-javanese-brown flex items-center gap-2">
+                    <i class="fa-solid fa-user-tie text-amber-600"></i>
+                    <span>MODE GURU - REKAP LOKAL</span>
+                </h3>
+                <button onclick="toggleTeacherModal()" class="text-stone-400 hover:text-stone-600 text-2xl font-bold">&times;</button>
+            </div>
+
+            <div class="flex-grow overflow-y-auto mb-4">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-left border-collapse">
+                        <thead>
+                            <tr class="bg-stone-100 border-b">
+                                <th class="p-2 font-bold">Nama</th>
+                                <th class="p-2 font-bold">Kelas</th>
+                                <th class="p-2 font-bold">Absen</th>
+                                <th class="p-2 font-bold">Skor</th>
+                                <th class="p-2 font-bold">Grade</th>
+                                <th class="p-2 font-bold">Langgar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teacherTableBody">
+                            <!-- Dynamically generated rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 justify-between pt-3 border-t">
+                <button onclick="sfx.playClick(); clearTeacherLogs()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 rounded-lg text-xs">
+                    Hapus Data Logs
+                </button>
+                <div class="flex gap-2">
+                    <button onclick="sfx.playClick(); exportToCSV()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xs flex items-center gap-1">
+                        <i class="fa-solid fa-file-csv"></i>
+                        <span>DOWNLOAD CSV</span>
+                    </button>
+                    <button onclick="toggleTeacherModal()" class="bg-stone-500 hover:bg-stone-600 text-white font-bold py-2 px-4 rounded-lg text-xs">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 6: CUSTOM NOTICE DIALOG (REPLACES ALERT) -->
+    <div id="modalNotice" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-javanese-cream border-2 border-amber-400 rounded-2xl max-w-sm w-full p-5 text-center shadow-2xl text-javanese-dark">
+            <div id="noticeIcon" class="text-4xl mb-2">ℹ️</div>
+            <h4 id="noticeTitle" class="font-cinzel text-lg font-bold text-javanese-brown mb-1">Informasi</h4>
+            <p id="noticeMessage" class="text-xs text-stone-700 mb-4 font-medium leading-relaxed"></p>
+            <button onclick="closeNoticeModal()" class="w-full bg-javanese-brown hover:bg-javanese-dark text-javanese-goldBright font-bold py-2.5 rounded-xl shadow text-xs">
+                Mengerteni
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL 7: RESUME SESSION PROMPT DIALOG -->
+    <div id="modalResume" class="hidden fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-javanese-cream border-2 border-amber-400 rounded-3xl max-w-md w-full p-6 text-center shadow-2xl text-javanese-dark">
+            <div class="text-5xl mb-2">🎮</div>
+            <h3 class="font-cinzel text-xl font-bold text-javanese-brown mb-2">LANJUTAKE GAME?</h3>
+            <p id="resumeMsgText" class="text-xs text-stone-700 mb-5">
+                Ditemokake sesi permainan sadurunge. Arep nerusake permainan?
+            </p>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="sfx.playClick(); confirmResumeGame(true)" class="bg-javanese-brown hover:bg-javanese-dark text-javanese-goldBright font-bold py-3 rounded-xl shadow text-xs">
+                    Lanjutake Game
+                </button>
+                <button onclick="sfx.playClick(); confirmResumeGame(false)" class="bg-stone-400 hover:bg-stone-500 text-white font-bold py-3 rounded-xl shadow text-xs">
+                    Mulai Saka Awal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+            }
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) this.ctx = new AudioContext();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+            playCorrect() {
+                this.init();
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc1 = this.ctx.createOscillator();
+                const osc2 = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc1.type = 'sine';
+                osc2.type = 'triangle';
+                osc1.frequency.setValueAtTime(523.25, now); // C5
+                osc1.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+                osc1.frequency.exponentialRampToValueAtTime(783.99, now + 0.25); // G5
+                osc1.frequency.exponentialRampToValueAtTime(1046.50, now + 0.4); // C6
+
+                osc2.frequency.setValueAtTime(261.63, now);
+                osc2.frequency.exponentialRampToValueAtTime(523.25, now + 0.4);
+
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+                osc1.connect(gain);
+                osc2.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc1.start(now);
+                osc2.start(now);
+                osc1.stop(now + 0.45);
+                osc2.stop(now + 0.45);
+            }
+            playWrong() {
+                this.init();
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.linearRampToValueAtTime(110, now + 0.35);
+
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.38);
+            }
+            playLevelUp() {
+                this.init();
+                if (!this.ctx) return;
+                const notes = [440, 554.37, 659.25, 880];
+                notes.forEach((freq, i) => {
+                    const now = this.ctx.currentTime + (i * 0.1);
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                });
+            }
+            playClick() {
+                this.init();
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(200, now + 0.05);
+                gain.gain.setValueAtTime(0.08, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            }
+        }
+        const sfx = new SoundFX();
+
+        const QUESTION_BANK = [
+            // LEVEL 1: KENALAN AKSARA JAWA (5 Questions)
+            {
+                id: 1,
+                level: 1,
+                type: 'choice',
+                question: 'Aksara Jawa nglegena cacahe gunggunge ana pira?',
+                options: ['18', '20', '22', '24'],
+                correctAnswer: '20',
+                explanation: 'Aksara nglegena cacahe ana 20 yaiku: ha, na, ca, ra, ka, da, ta, sa, wa, la, pa, dha, ja, ya, nya, ma, ga, ba, tha, nga.',
+                points: 3
+            },
+            {
+                id: 2,
+                level: 1,
+                type: 'choice',
+                question: 'Aksara Jawa ing ngisor iki kang kalebu Aksara Murda yaiku...',
+                options: ['ꦟ (Na Murda)', 'ꦲ (Ha)', 'ꦭ (La)', 'ꦩ (Ma)'],
+                correctAnswer: 'ꦟ (Na Murda)',
+                explanation: 'ꦟ yaiku Aksara Murda Na. Aksara Murda digunakake kanggo nulis jeneng pakurmatan, gelar, utawa papan panggonan.',
+                points: 3
+            },
+            {
+                id: 3,
+                level: 1,
+                type: 'choice',
+                question: 'Sandhangan swara kang ngowahi bunyi vokal dadi "u" diarani...',
+                options: ['Wulu', 'Suku', 'Pepet', 'Taling'],
+                correctAnswer: 'Suku',
+                explanation: 'Suku ( ꦸ ) minangka sandhangan swara kang ngowahi vokal dadi "u". Tuladha: ꦏꦸ (ku).',
+                points: 3
+            },
+            {
+                id: 4,
+                level: 1,
+                type: 'choice',
+                question: 'Kang kalebu Angka Jawa 5 (lima) yaiku...',
+                options: ['꧑', '꧓', '꧕', '꧗'],
+                correctAnswer: '꧕',
+                explanation: 'Angka Jawa lima ditulisi ꧕. Urutane: ꧑(1), ꧒(2), ꧓(3), ꧔(4), ꧕(5).',
+                points: 3
+            },
+            {
+                id: 5,
+                level: 1,
+                type: 'choice',
+                question: 'Gunane Pasangan ing Aksara Jawa yaiku kanggo...',
+                options: [
+                    'Ngenteni aksara mati ing pungkasan ukara',
+                    'Mateni vokal aksara sadurunge saengga dadi aksara sigeg (mati)',
+                    'Nulis angka Jawa',
+                    'Ngganti sandhangan swara'
+                ],
+                correctAnswer: 'Mateni vokal aksara sadurunge saengga dadi aksara sigeg (mati)',
+                explanation: 'Pasangan digunakake kanggo mateni vokal aksara sadurunge saengga dadi aksara mati (sigeg).',
+                points: 3
+            },
+
+            // LEVEL 2: COCOKKAN AKSARA JAWA ↔ LATIN (5 Pair Matching Sets)
+            {
+                id: 6,
+                level: 2,
+                type: 'match',
+                question: 'Cocokake Aksara Jawa karo wacane Latin kang bener:',
+                pairs: [
+                    { aksara: 'ꦏꦭ', latin: 'Kala' },
+                    { aksara: 'ꦱꦧ', latin: 'Saba' },
+                    { aksara: 'ꦫꦗ', latin: 'Raja' },
+                    { aksara: 'ꦩꦠ', latin: 'Mata' }
+                ],
+                explanation: 'Pasangan kang bener: ꦏꦭ = Kala, ꦱꦧ = Saba, ꦫꦗ = Raja, ꦩꦠ = Mata.',
+                points: 3
+            },
+            {
+                id: 7,
+                level: 2,
+                type: 'match',
+                question: 'Cocokake Sandhangan Panyegeg iki karo arane:',
+                pairs: [
+                    { aksara: 'ꦭꦪꦂ ( ꦂ )', latin: 'Mati -r' },
+                    { aksara: 'ꦕꦺꦕꦏ꧀ ( ꦁ )', latin: 'Mati -ng' },
+                    { aksara: 'ꦮꦶꦒ꧀ꦚꦤ꧀ ( ꦃ )', latin: 'Mati -h' },
+                    { aksara: 'ꦡꦁꦏꦺꦴꦤ꧀ ( ꧀ )', latin: 'Pemathen Swara' }
+                ],
+                explanation: 'Layar (-r), Cecak (-ng), Wignyan (-h), lan Pangkon minangka pemathen vokal.',
+                points: 3
+            },
+            {
+                id: 8,
+                level: 2,
+                type: 'match',
+                question: 'Cocokake Angka Jawa karo Angka Latin:',
+                pairs: [
+                    { aksara: '꧑', latin: '1' },
+                    { aksara: '꧔', latin: '4' },
+                    { aksara: '꧗', latin: '7' },
+                    { aksara: '꧙', latin: '9' }
+                ],
+                explanation: 'Angka Jawa ꧑ = 1, ꧔ = 4, ꧗ = 7, ꧙ = 9.',
+                points: 3
+            },
+            {
+                id: 9,
+                level: 2,
+                type: 'match',
+                question: 'Cocokake Aksara Murda karo Aksara Latin kapital:',
+                pairs: [
+                    { aksara: 'ꦟ', latin: 'Na Murda' },
+                    { aksara: 'ꦑ', latin: 'Ka Murda' },
+                    { aksara: 'ꦯ', latin: 'Sa Murda' },
+                    { aksara: 'ꦦ', latin: 'Pa Murda' }
+                ],
+                explanation: 'Aksara Murda minangka aksara khusus kanggo nulis jeneng utawa gelar pakurmatan.',
+                points: 3
+            },
+            {
+                id: 10,
+                level: 2,
+                type: 'match',
+                question: 'Cocokake Tembung Jawa lan Tulisan Aksarane:',
+                pairs: [
+                    { aksara: 'ꦧꦠꦏ꧀', latin: 'Batak' },
+                    { aksara: 'ꦧꦥꦏ꧀', latin: 'Bapak' },
+                    { aksara: 'ꦤꦒꦫ', latin: 'Nagara' },
+                    { aksara: 'ꦱꦼꦒ', latin: 'Sega' }
+                ],
+                explanation: 'ꦧꦠꦏ꧀ = Batak, ꦧꦥꦏ꧀ = Bapak, ꦤꦒꦫ = Nagara, ꦱꦼꦒ = Sega (nganggo pepet).',
+                points: 3
+            },
+
+            // LEVEL 3: BACA AKSARA JAWA (Aksara -> Latin) (5 Questions)
+            {
+                id: 11,
+                level: 3,
+                type: 'choice',
+                question: 'Wacanen Aksara Jawa ing ngisor iki:\n<div class="aksara-text text-3xl font-bold my-2 text-amber-900">ꦱꦸꦫꦧꦪ</div>',
+                options: ['Surakarta', 'Surabaya', 'Sukoharjo', 'Sumenep'],
+                correctAnswer: 'Surabaya',
+                explanation: 'ꦱꦸ (Su) - ꦫ (ra) - ꦧ (ba) - ꦪ (ya) dibaca "Surabaya".',
+                points: 3
+            },
+            {
+                id: 12,
+                level: 3,
+                type: 'choice',
+                question: 'Wacanen Aksara Jawa ing ngisor iki:\n<div class="aksara-text text-3xl font-bold my-2 text-amber-900">ꦧꦸꦢꦶꦭꦸꦲꦸꦂ</div>',
+                options: ['Budi luhur', 'Budi waluya', 'Budi pekerti', 'Budi karya'],
+                correctAnswer: 'Budi luhur',
+                explanation: 'ꦧꦸ (bu) - ꦢꦶ (di) - ꦭꦸ (lu) - ꦲꦸꦂ (hur nganggo layar) dibaca "Budi luhur".',
+                points: 3
+            },
+            {
+                id: 13,
+                level: 3,
+                type: 'choice',
+                question: 'Wacanen Ukara ing ngisor iki:\n<div class="aksara-text text-3xl font-bold my-2 text-amber-900">ꦠꦿꦱ꧀ꦤꦧꦸꦢꦪ</div>',
+                options: ['Tresna budaya', 'Tirta budaya', 'Karsa budaya', 'Tandha budaya'],
+                correctAnswer: 'Tresna budaya',
+                explanation: 'ꦠꦿ (tre nganggo Cakra) - ꦱ꧀ꦤ (sna nganggo pasangan na) - ꦧꦸ (bu) - ꦢ (da) - ꦪ (ya) dibaca "Tresna budaya".',
+                points: 3
+            },
+            {
+                id: 14,
+                level: 3,
+                type: 'choice',
+                question: 'Wacanen Aksara Jawa ing ngisor iki:\n<div class="aksara-text text-3xl font-bold my-2 text-amber-900">ꦩꦔꦤ꧀ꦱꦠꦏ꧀</div>',
+                options: ['Mangan satak', 'Mangan kotak', 'Mangan bakso', 'Mangan sega'],
+                correctAnswer: 'Mangan satak',
+                explanation: 'ꦩꦔꦤ꧀ (mangan) - ꦱꦠꦏ꧀ (satak) dibaca "Mangan satak".',
+                points: 3
+            },
+            {
+                id: 15,
+                level: 3,
+                type: 'choice',
+                question: 'Wacanen Ukara ing ngisor iki:\n<div class="aksara-text text-3xl font-bold my-2 text-amber-900">ꦏꦿꦶꦝꦮꦶꦪꦠ</div>',
+                options: ['Kridha wiyata', 'Kridha sabda', 'Kridha bapak', 'Krama wiyata'],
+                correctAnswer: 'Kridha wiyata',
+                explanation: 'ꦏꦿꦶ (Kri) - ꦝ (dha) - ꦮꦶ (wi) - ꦪ (ya) - ꦠ (ta) dibaca "Kridha wiyata".',
+                points: 3
+            },
+
+            // LEVEL 4: TULIS AKSARA JAWA (Latin -> Aksara) (5 Questions)
+            {
+                id: 16,
+                level: 4,
+                type: 'choice',
+                question: 'Aksara Jawa kang bener kanggo tembung "Mapan" yaiku...',
+                options: ['ꦩꦥꦤ꧀', 'ꦩꦥꦤ', 'ꦩꦥꦁ', 'ꦩꦥꦂ'],
+                correctAnswer: 'ꦩꦥꦤ꧀',
+                explanation: 'ꦩꦥꦤ꧀ dumadi saka ꦩ (ma), ꦥ (pa), lan ꦤ꧀ (na dipangkon dadi mati n).',
+                points: 3
+            },
+            {
+                id: 17,
+                level: 4,
+                type: 'choice',
+                question: 'Tulisan Aksara Jawa kang bener kanggo "Surakarta" yaiku...',
+                options: ['ꦱꦸꦫꦏꦂꦠ', 'ꦱꦸꦫꦏꦠ', 'ꦱꦸꦫꦏꦁꦠ', 'ꦱꦸꦫꦏꦃꦠ'],
+                correctAnswer: 'ꦱꦸꦫꦏꦂꦠ',
+                explanation: 'ꦱꦸ (su) - ꦫ (ra) - ꦏꦂ (kar nganggo Layar) - ꦠ (ta) = Surakarta.',
+                points: 3
+            },
+            {
+                id: 18,
+                level: 4,
+                type: 'choice',
+                question: 'Tulisan Aksara Jawa kang bener kanggo tembung "Pangestu" yaiku...',
+                options: ['ꦥꦔꦺꦱ꧀ꦠꦸ', 'ꦥꦔꦱ꧀ꦠꦸ', 'ꦥꦔꦺꦱꦠꦸ', 'ꦥꦔꦺꦱ꧀ꦠꦶ'],
+                correctAnswer: 'ꦥꦔꦺꦱ꧀ꦠꦸ',
+                explanation: 'ꦥ (pa) - ꦔꦺ (nge nganggo taling) - ꦱ꧀ꦠꦸ (stu nganggo pasangan ta disuku) = Pangestu.',
+                points: 3
+            },
+            {
+                id: 19,
+                level: 4,
+                type: 'choice',
+                question: 'Tulisan Aksara Jawa "Wayang Kulit" kang trep yaiku...',
+                options: ['ꦮꦪꦁꦏꦸꦭꦶꦠ꧀', 'ꦮꦪꦂꦏꦸꦭꦶꦠ꧀', 'ꦮꦪꦃꦏꦸꦭꦶꦠ꧀', 'ꦮꦪꦁꦏꦸꦭꦶꦠ'],
+                correctAnswer: 'ꦮꦪꦁꦏꦸꦭꦶꦠ꧀',
+                explanation: 'ꦮꦪꦁ (wayang nganggo cecak) - ꦏꦸ (ku) - ꦭꦶ (li) - ꦠ꧀ (t dipangkon).',
+                points: 3
+            },
+            {
+                id: 20,
+                level: 4,
+                type: 'choice',
+                question: 'Aksara Jawa kang trep kanggo ukara "Siswa SMA" yaiku...',
+                options: ['ꦱꦶꦱ꧀ꦮꦱ꧀ꦩ', 'ꦱꦶꦱ꧀ꦮꦱꦩ', 'ꦱꦶꦱꦮꦱ꧀ꦩ', 'ꦱꦶꦱ꧀ꦮꦱ꧀ꦩ꧀'],
+                correctAnswer: 'ꦱꦶꦱ꧀ꦮꦱ꧀ꦩ',
+                explanation: 'ꦱꦶꦱ꧀ꦮ (Siswa nganggo pasangan wa) + ꦱ꧀ꦩ (SMA nganggo pasangan ma).',
+                points: 3
+            },
+
+            // LEVEL 5: PASANGAN LAN SANDHANGAN (5 Questions)
+            {
+                id: 21,
+                level: 5,
+                type: 'choice',
+                question: 'Pasangan aksara Jawa kang wujude padha persis karo aksara nglegenane yaiku...',
+                options: ['ꦫ, ꦒ, ꦔ, ꦪ', 'ꦏ, ꦭ, ꦥ', 'ꦠ, ꦢ, ꦱ', 'ꦧ, ꦩ, ꦗ'],
+                correctAnswer: 'ꦫ, ꦒ, ꦔ, ꦪ',
+                explanation: 'Pasangan ra, ga, nga, lan ya duwe wujud kang meh padha/identik karo aksara nglegenane.',
+                points: 3
+            },
+            {
+                id: 22,
+                level: 5,
+                type: 'choice',
+                question: 'Manawa ana aksara sigeg (mati) ing tengah ukara, carane mateni vokal yaiku nganggo...',
+                options: ['Pangkon', 'Pasangan aksara sabanjure', 'Sandhangan cecak', 'Sandhangan layar'],
+                correctAnswer: 'Pasangan aksara sabanjure',
+                explanation: 'Ing tengah ukara, mateni aksara sigeg ora kena nganggo pangkon, nanging kudu nganggo PASANGAN aksara ing sabanjure.',
+                points: 3
+            },
+            {
+                id: 23,
+                level: 5,
+                type: 'choice',
+                question: 'Sandhangan Swara "Taling Tarung" ( ꦺ...ꦴ ) iku minangka pangganti swara vokal...',
+                options: ['e (pepet)', 'o', 'é (taling)', 'u (suku)'],
+                correctAnswer: 'o',
+                explanation: 'Taling tarung digunakake kanggo ngowahi swara dadi "o". Tuladha: ꦠꦺꦴꦠꦺꦴ (toto).',
+                points: 3
+            },
+            {
+                id: 24,
+                level: 5,
+                type: 'choice',
+                question: 'Tembung "Gajah" ing Aksara Jawa pungkasaning aksara nggunakake sandhangan panyegeg...',
+                options: ['Layar (-r)', 'Cecak (-ng)', 'Wignyan (-h)', 'Pangkon'],
+                correctAnswer: 'Wignyan (-h)',
+                explanation: 'Wignyan ( ꦃ ) minangka sandhangan panyegeg kanggo konsonan mati "-h". Tuladha: ꦒꦗꦃ (gajah).',
+                points: 3
+            },
+            {
+                id: 25,
+                level: 5,
+                type: 'choice',
+                question: 'Panganggoning Pangkon ( ꧀ ) kang bener miturut tata tatanan Aksara Jawa yaiku...',
+                options: [
+                    'Mung ing pungkasan ukara utawa pada',
+                    'Ing tengah ukara kanggo mateni aksara vokal',
+                    'Bisa ing ngendi wae yen aksarane angel',
+                    'Kanggo ngganti sandhangan swara'
+                ],
+                correctAnswer: 'Mung ing pungkasan ukara utawa pada',
+                explanation: 'Pangkon mung entuk digunakake ing PUNGKASAN ukara/pada. Yen ing tengah ukara kudu nganggo pasangan.',
+                points: 3
+            },
+
+            // LEVEL 6: TANTANGAN AKHIR (5 Mixed Advanced Questions)
+            {
+                id: 26,
+                level: 6,
+                type: 'choice',
+                question: 'Wacanen ukara komplit Aksara Jawa iki:\n<div class="aksara-text text-3xl font-bold my-2 text-amber-900">ꦟꦒꦫꦆꦤ꧀ꦢꦺꦴꦤꦺꦱꦶꦪ</div>',
+                options: ['Nagara Indonesia', 'Nagara Ngayogyakarta', 'Nagara Surakarta', 'Nagara Nusantara'],
+                correctAnswer: 'Nagara Indonesia',
+                explanation: 'ꦟ (Na Murda) - ꦒ (ga) - ꦫ (ra) + ꦆꦤ꧀ꦢꦺꦴꦤꦺꦱꦶꦪ (Indonesia) = Nagara Indonesia.',
+                points: 4
+            },
+            {
+                id: 27,
+                level: 6,
+                type: 'choice',
+                question: 'Tulisan Angka Jawa "Tahun 2026" kang trep yaiku...',
+                options: ['ꦠꦲꦸꦤ꧀ ꧒꧐꧒꧖', 'ꦠꦲꦸꦤ꧀ ꧑꧐꧒꧖', 'ꦠꦲꦸꦤ꧀ ꧒꧐꧒꧕', 'ꦠꦲꦸꦤ꧀ ꧓꧐꧒꧖'],
+                correctAnswer: 'ꦠꦲꦸꦤ꧀ ꧒꧐꧒꧖',
+                explanation: '꧒ = 2, ꧐ = 0, ꧒ = 2, ꧖ = 6. Dadi "Tahun 2026" yaiku ꦠꦲꦸꦤ꧀ ꧒꧐꧒꧖.',
+                points: 4
+            },
+            {
+                id: 28,
+                level: 6,
+                type: 'choice',
+                question: 'Unsur sandhangan kang digunakake ing tembung "Swarajati" yaiku...',
+                options: ['Cakra lan Wulu', 'Pengkal lan Suku', 'Keret lan Pepet', 'Cakra lan Pepet'],
+                correctAnswer: 'Cakra lan Wulu',
+                explanation: 'Swarajati ngandhut Pasangan Wa, Cakra (utawa Cakra wulu) lan wulu kanggo nyuwarakake "i".',
+                points: 4
+            },
+            {
+                id: 29,
+                level: 6,
+                type: 'choice',
+                question: 'Wacanen aksara Jawa iki:\n<div class="aksara-text text-3xl font-bold my-2 text-amber-900">ꦏꦭꦮꦶꦢꦾꦏꦸꦭꦺꦴꦤ꧀</div>',
+                options: ['Kalawidya kulon', 'Kalawidya wetan', 'Kalawarta anyar', 'Katamarga Jawa'],
+                correctAnswer: 'Kalawidya kulon',
+                explanation: 'ꦏꦭꦮꦶꦢꦾ (Kalawidya nganggo pengkal) - ꦏꦸꦭꦺꦴꦤ꧀ (kulon).',
+                points: 4
+            },
+            {
+                id: 30,
+                level: 6,
+                type: 'choice',
+                question: 'Apa bedane Aksara Murda lan Aksara Nglegena ing pamagane?',
+                options: [
+                    'Aksara Murda mung kanggo nulis jeneng pakurmatan/gelar/kota',
+                    'Aksara Murda luwih sithik tinimbang sandhangan',
+                    'Aksara Murda ora duwe pasangan',
+                    'Aksara Murda mung digunakake ing pungkasan ukara'
+                ],
+                correctAnswer: 'Aksara Murda mung kanggo nulis jeneng pakurmatan/gelar/kota',
+                explanation: 'Aksara Murda fungse kaya huruf kapital kanggo nulis jeneng wong gedhe, gelar, lembaga, lan kota.',
+                points: 4
+            }
+        ];
+
+        let gameState = {
+            student: { name: '', class: '', absen: '' },
+            currentLevel: 1,
+            currentQuestionIdx: 0,
+            score: 0,
+            lives: 3,
+            streak: 0,
+            violations: 0,
+            timerSeconds: 0,
+            timerInterval: null,
+            correctCount: 0,
+            wrongCount: 0,
+            levelQuestions: [],
+            matchedPairs: {},
+            selectedPairLeft: null,
+            selectedPairRight: null,
+            unlockedBadges: [],
+            isGameLocked: false
+        };
+
+        const TEACHER_PHONE = "6282226116413";
+        const TEACHER_PIN = "GURU123";
+
+        // DOM Load Initialization
+        window.onload = function() {
+            checkLocalStorageRecovery();
+            setupAntiCheatListeners();
+        };
+
+        function showCustomNotice(title, msg, icon = "ℹ️") {
+            document.getElementById('noticeTitle').textContent = title;
+            document.getElementById('noticeMessage').textContent = msg;
+            document.getElementById('noticeIcon').textContent = icon;
+            document.getElementById('modalNotice').classList.remove('hidden');
+        }
+
+        function closeNoticeModal() {
+            document.getElementById('modalNotice').classList.add('hidden');
+        }
+
+        function checkLocalStorageRecovery() {
+            const saved = localStorage.getItem('aksara_game_state');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (parsed.student && parsed.student.name && parsed.currentLevel <= 6) {
+                        document.getElementById('resumeMsgText').textContent = 
+                            `Ditemokake sesi permainan ${parsed.student.name} (${parsed.student.class}). Arep nerusake Level ${parsed.currentLevel}?`;
+                        document.getElementById('modalResume').classList.remove('hidden');
+                        window.pendingResumeState = parsed;
+                        return;
+                    }
+                } catch(e) { console.error(e); }
+            }
+            showScreen('screenWelcome');
+        }
+
+        function confirmResumeGame(shouldResume) {
+            document.getElementById('modalResume').classList.add('hidden');
+            if (shouldResume && window.pendingResumeState) {
+                gameState = { ...gameState, ...window.pendingResumeState };
+                showScreen('screenGame');
+                startTimer();
+                loadLevel(gameState.currentLevel);
+            } else {
+                clearLocalStorage();
+                showScreen('screenWelcome');
+            }
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('aksara_game_state', JSON.stringify(gameState));
+        }
+
+        function clearLocalStorage() {
+            localStorage.removeItem('aksara_game_state');
+        }
+
+        function showScreen(screenId) {
+            const screens = ['screenWelcome', 'screenIdentity', 'screenRules', 'screenGame', 'screenResult'];
+            screens.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+
+            const target = document.getElementById(screenId);
+            if (target) target.classList.remove('hidden');
+
+            const topStats = document.getElementById('topStatsBar');
+            const topProgress = document.getElementById('topProgressBarContainer');
+
+            if (screenId === 'screenGame') {
+                topStats.classList.remove('hidden');
+                topProgress.classList.remove('hidden');
+            } else {
+                topStats.classList.add('hidden');
+                topProgress.classList.add('hidden');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function handleIdentitySubmit(e) {
+            e.preventDefault();
+            sfx.playClick();
+            const name = document.getElementById('inputName').value.trim();
+            const cls = document.getElementById('inputClass').value.trim();
+            const abs = document.getElementById('inputAbsen').value.trim();
+
+            if (!name || !cls || !abs) {
+                showCustomNotice('Data Ora Lengkap', 'Mangga isi kabeh data identitas siswa sadurunge miwiti!', '⚠️');
+                return;
+            }
+
+            gameState.student = { name: name, class: cls, absen: abs };
+            saveToLocalStorage();
+            showScreen('screenRules');
+        }
+
+        function requestFullscreenMode() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().catch(() => {});
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+        }
+
+        function setupAntiCheatListeners() {
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden && gameState.timerInterval) {
+                    registerViolation("Pindhah Tab / Metu Browser");
+                }
+            });
+
+            window.addEventListener('blur', () => {
+                if (gameState.timerInterval) {
+                    registerViolation("Kehilangan Fokus Jendela");
+                }
+            });
+
+            document.addEventListener('fullscreenchange', () => {
+                if (!document.fullscreenElement && gameState.timerInterval) {
+                    registerViolation("Metu saka Fullscreen");
+                }
+            });
+        }
+
+        function registerViolation(reason) {
+            if (gameState.isGameLocked) return;
+
+            gameState.violations++;
+            updateStatsUI();
+
+            if (gameState.violations >= 3) {
+                gameState.isGameLocked = true;
+                pauseTimer();
+                sfx.playWrong();
+                document.getElementById('modalLocked').classList.remove('hidden');
+            } else {
+                sfx.playWrong();
+                document.getElementById('warningCountText').textContent = gameState.violations;
+                document.getElementById('modalWarning').classList.remove('hidden');
+            }
+            saveToLocalStorage();
+        }
+
+        function dismissWarningAndResume() {
+            document.getElementById('modalWarning').classList.add('hidden');
+            requestFullscreenMode();
+        }
+
+        function unlockGameWithPin() {
+            const pin = document.getElementById('inputTeacherPin').value;
+            if (pin === TEACHER_PIN) {
+                gameState.isGameLocked = false;
+                gameState.violations = 0;
+                document.getElementById('modalLocked').classList.add('hidden');
+                updateStatsUI();
+                startTimer();
+                requestFullscreenMode();
+                showCustomNotice('Berhasil Unlocked', 'Kunci game wis dibukak dening Guru!', '🔓');
+            } else {
+                sfx.playWrong();
+                showCustomNotice('PIN Salah', 'PIN Guru sing diketik salah! Hubungi gurumu.', '❌');
+            }
+        }
+
+        function startGameAdventure() {
+            requestFullscreenMode();
+            showScreen('screenGame');
+
+            gameState.score = 0;
+            gameState.lives = 3;
+            gameState.currentLevel = 1;
+            gameState.streak = 0;
+            gameState.violations = 0;
+            gameState.timerSeconds = 0;
+            gameState.correctCount = 0;
+            gameState.wrongCount = 0;
+            gameState.unlockedBadges = [];
+
+            startTimer();
+            loadLevel(1);
+        }
+
+        function startTimer() {
+            if (gameState.timerInterval) clearInterval(gameState.timerInterval);
+            gameState.timerInterval = setInterval(() => {
+                gameState.timerSeconds++;
+                updateStatsUI();
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+                gameState.timerInterval = null;
+            }
+        }
+
+        function formatTime(secs) {
+            const m = Math.floor(secs / 60).toString().padStart(2, '0');
+            const s = (secs % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function updateStatsUI() {
+            document.getElementById('statScore').textContent = gameState.score;
+            document.getElementById('statLives').textContent = '❤️'.repeat(Math.max(0, gameState.lives));
+            document.getElementById('statLevel').textContent = gameState.currentLevel;
+            document.getElementById('statTimer').textContent = formatTime(gameState.timerSeconds);
+            document.getElementById('statViolations').textContent = `${gameState.violations}/3`;
+            document.getElementById('streakCount').textContent = gameState.streak;
+
+            const totalQuestions = 30;
+            const currentTotalIndex = ((gameState.currentLevel - 1) * 5) + gameState.currentQuestionIdx;
+            const pct = Math.min(100, Math.round((currentTotalIndex / totalQuestions) * 100));
+            document.getElementById('topProgressBar').style.width = `${pct}%`;
+        }
+
+        function shuffleArray(arr) {
+            const array = [...arr];
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function loadLevel(levelNum) {
+            gameState.currentLevel = levelNum;
+            gameState.currentQuestionIdx = 0;
+
+            const rawQuestions = QUESTION_BANK.filter(q => q.level === levelNum);
+            gameState.levelQuestions = shuffleArray(rawQuestions);
+
+            const levelTitles = [
+                'LEVEL 1: KENALAN AKSARA',
+                'LEVEL 2: COCOKKAN AKSARA',
+                'LEVEL 3: BACA AKSARA JAWA',
+                'LEVEL 4: TULIS AKSARA JAWA',
+                'LEVEL 5: PASANGAN & SANDHANGAN',
+                'LEVEL 6: TANTANGAN AKHIR'
+            ];
+
+            document.getElementById('levelBadge').textContent = levelTitles[levelNum - 1] || `LEVEL ${levelNum}`;
+            renderCurrentQuestion();
+        }
+
+        function renderCurrentQuestion() {
+            updateStatsUI();
+            const container = document.getElementById('questionContainer');
+
+            const currentQ = gameState.levelQuestions[gameState.currentQuestionIdx];
+            if (!currentQ) {
+                handleLevelCompleted();
+                return;
+            }
+
+            document.getElementById('questionTitle').textContent = `Soal No. ${gameState.currentQuestionIdx + 1} / 5`;
+
+            if (currentQ.type === 'choice') {
+                const shuffledOpts = shuffleArray(currentQ.options);
+                container.innerHTML = `
+                    <div class="mb-5">
+                        <div class="text-stone-800 font-bold text-sm sm:text-base leading-relaxed whitespace-pre-line">
+                            ${currentQ.question}
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        ${shuffledOpts.map((opt, idx) => `
+                            <button onclick="sfx.playClick(); selectMultipleChoice('${opt.replace(/'/g, "\\'")}', this)" class="opt-btn card-hover text-left p-4 rounded-2xl border-2 border-amber-300 bg-white hover:border-amber-500 hover:bg-amber-50 text-xs sm:text-sm font-semibold text-stone-800 flex items-center justify-between shadow-sm active:scale-95">
+                                <span class="aksara-text text-base">${opt}</span>
+                                <span class="w-7 h-7 rounded-full border border-amber-400 bg-amber-100 flex items-center justify-center text-xs text-amber-800 font-extrabold flex-shrink-0 ml-2">${String.fromCharCode(65 + idx)}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (currentQ.type === 'match') {
+                gameState.matchedPairs = {};
+                gameState.selectedPairLeft = null;
+                gameState.selectedPairRight = null;
+
+                const leftItems = shuffleArray(currentQ.pairs.map(p => p.aksara));
+                const rightItems = shuffleArray(currentQ.pairs.map(p => p.latin));
+
+                container.innerHTML = `
+                    <div class="mb-4 text-center">
+                        <p class="text-stone-800 font-bold text-sm sm:text-base">${currentQ.question}</p>
+                        <p class="text-xs text-amber-800 mt-1 font-medium bg-amber-100 py-1 px-3 rounded-full inline-block">Klik Aksara Jawa (Kiwa), banjur klik Pasangan Latin (Tengen)!</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4 my-2">
+                        <!-- Left Column (Aksara) -->
+                        <div class="space-y-2">
+                            ${leftItems.map(item => `
+                                <button onclick="sfx.playClick(); handleMatchLeft('${item.replace(/'/g, "\\'")}', this)" class="match-left w-full p-3.5 rounded-xl border-2 border-amber-300 bg-amber-50 text-xs sm:text-sm font-black text-amber-950 aksara-text text-center card-hover shadow-sm active:scale-95">
+                                    ${item}
+                                </button>
+                            `).join('')}
+                        </div>
+                        <!-- Right Column (Latin) -->
+                        <div class="space-y-2">
+                            ${rightItems.map(item => `
+                                <button onclick="sfx.playClick(); handleMatchRight('${item.replace(/'/g, "\\'")}', this)" class="match-right w-full p-3.5 rounded-xl border-2 border-stone-300 bg-white text-xs sm:text-sm font-bold text-stone-800 text-center card-hover shadow-sm active:scale-95">
+                                    ${item}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div id="matchPairsStatus" class="mt-3 text-xs font-bold text-center text-amber-900 bg-amber-200/60 py-1.5 rounded-xl">
+                        Dipasangake: 0 / ${currentQ.pairs.length}
+                    </div>
+                `;
+            }
+            saveToLocalStorage();
+        }
+
+        function selectMultipleChoice(answer, btnElem) {
+            const currentQ = gameState.levelQuestions[gameState.currentQuestionIdx];
+            const isCorrect = (answer === currentQ.correctAnswer);
+
+            processAnswerResult(isCorrect, currentQ.explanation, currentQ.points);
+        }
+
+        function handleMatchLeft(aksaraVal, btnElem) {
+            document.querySelectorAll('.match-left').forEach(b => {
+                if (!b.disabled) {
+                    b.classList.remove('border-amber-600', 'bg-amber-200', 'ring-2', 'ring-amber-500');
+                    b.classList.add('border-amber-300', 'bg-amber-50');
+                }
+            });
+            btnElem.classList.remove('border-amber-300', 'bg-amber-50');
+            btnElem.classList.add('border-amber-600', 'bg-amber-200', 'ring-2', 'ring-amber-500');
+            gameState.selectedPairLeft = { val: aksaraVal, elem: btnElem };
+            checkAndPairMatch();
+        }
+
+        function handleMatchRight(latinVal, btnElem) {
+            document.querySelectorAll('.match-right').forEach(b => {
+                if (!b.disabled) {
+                    b.classList.remove('border-amber-600', 'bg-amber-200', 'ring-2', 'ring-amber-500');
+                    b.classList.add('border-stone-300', 'bg-white');
+                }
+            });
+            btnElem.classList.remove('border-stone-300', 'bg-white');
+            btnElem.classList.add('border-amber-600', 'bg-amber-200', 'ring-2', 'ring-amber-500');
+            gameState.selectedPairRight = { val: latinVal, elem: btnElem };
+            checkAndPairMatch();
+        }
+
+        function checkAndPairMatch() {
+            if (gameState.selectedPairLeft && gameState.selectedPairRight) {
+                const currentQ = gameState.levelQuestions[gameState.currentQuestionIdx];
+                const left = gameState.selectedPairLeft;
+                const right = gameState.selectedPairRight;
+
+                left.elem.classList.remove('border-amber-300', 'bg-amber-50', 'border-amber-600', 'bg-amber-200', 'ring-2', 'ring-amber-500');
+                left.elem.classList.add('border-green-600', 'bg-green-100', 'text-green-900');
+                left.elem.disabled = true;
+
+                right.elem.classList.remove('border-stone-300', 'bg-white', 'border-amber-600', 'bg-amber-200', 'ring-2', 'ring-amber-500');
+                right.elem.classList.add('border-green-600', 'bg-green-100', 'text-green-900');
+                right.elem.disabled = true;
+
+                gameState.matchedPairs[left.val] = right.val;
+
+                gameState.selectedPairLeft = null;
+                gameState.selectedPairRight = null;
+
+                const count = Object.keys(gameState.matchedPairs).length;
+                document.getElementById('matchPairsStatus').textContent = `Dipasangake: ${count} / ${currentQ.pairs.length}`;
+
+                if (count === currentQ.pairs.length) {
+                    let allCorrect = true;
+                    currentQ.pairs.forEach(pair => {
+                        if (gameState.matchedPairs[pair.aksara] !== pair.latin) {
+                            allCorrect = false;
+                        }
+                    });
+
+                    setTimeout(() => {
+                        processAnswerResult(allCorrect, currentQ.explanation, currentQ.points);
+                    }, 350);
+                }
+            }
+        }
+
+        function processAnswerResult(isCorrect, explanation, pts) {
+            const icon = document.getElementById('feedbackIcon');
+            const title = document.getElementById('feedbackTitle');
+            const body = document.getElementById('feedbackBody');
+            const modalBox = document.getElementById('modalFeedbackBox');
+
+            if (isCorrect) {
+                sfx.playCorrect();
+                gameState.streak++;
+                let bonus = gameState.streak > 2 ? 1 : 0;
+                gameState.score += (pts + bonus);
+                gameState.correctCount++;
+
+                icon.textContent = '🎉';
+                title.textContent = `Bener Banget! (+${pts + bonus} Poin)`;
+                title.className = 'font-cinzel text-2xl font-bold text-green-700';
+                modalBox.className = 'bg-javanese-cream border-4 border-green-500 rounded-3xl max-w-md w-full p-6 shadow-2xl text-javanese-dark transform transition-all';
+            } else {
+                sfx.playWrong();
+                gameState.streak = 0;
+                gameState.lives--;
+                gameState.wrongCount++;
+
+                icon.textContent = '❌';
+                title.textContent = 'Kurang Trep! (Nyawa -1)';
+                title.className = 'font-cinzel text-2xl font-bold text-red-600';
+                modalBox.className = 'bg-javanese-cream border-4 border-red-500 rounded-3xl max-w-md w-full p-6 shadow-2xl text-javanese-dark transform transition-all animate-shake';
+            }
+
+            body.innerHTML = `
+                <p class="font-bold text-stone-800 mb-2 border-b border-amber-200 pb-1">Pembahasan / Katrangan:</p>
+                <p class="text-stone-700 leading-relaxed font-medium">${explanation}</p>
+            `;
+
+            updateStatsUI();
+
+            if (gameState.lives <= 0) {
+                pauseTimer();
+                document.getElementById('modalGameOver').classList.remove('hidden');
+            } else {
+                document.getElementById('modalFeedback').classList.remove('hidden');
+            }
+        }
+
+        function closeFeedbackAndNext() {
+            document.getElementById('modalFeedback').classList.add('hidden');
+            gameState.currentQuestionIdx++;
+
+            if (gameState.currentQuestionIdx >= gameState.levelQuestions.length) {
+                handleLevelCompleted();
+            } else {
+                renderCurrentQuestion();
+            }
+        }
+
+        function handleLevelCompleted() {
+            sfx.playLevelUp();
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 90,
+                    spread: 80,
+                    origin: { y: 0.6 }
+                });
+            }
+
+            if (gameState.currentLevel === 1 && !gameState.unlockedBadges.includes('Pangripta Aksara')) {
+                gameState.unlockedBadges.push('Pangripta Aksara');
+            }
+            if (gameState.currentLevel === 3 && !gameState.unlockedBadges.includes('Wicaksana Aksara')) {
+                gameState.unlockedBadges.push('Wicaksana Aksara');
+            }
+            if (gameState.currentLevel === 6 && !gameState.unlockedBadges.includes('Master Aksara Jawa')) {
+                gameState.unlockedBadges.push('Master Aksara Jawa');
+            }
+
+            if (gameState.currentLevel < 6) {
+                showCustomNotice(
+                    `Level ${gameState.currentLevel} Selesai!`, 
+                    `Selamat! Sampeyan wis ngrampungake Level ${gameState.currentLevel}. Ayo nerusake menyang Level ${gameState.currentLevel + 1}!`, 
+                    '🏆'
+                );
+                loadLevel(gameState.currentLevel + 1);
+            } else {
+                finishWholeGame();
+            }
+        }
+
+        function restartFromGameOver() {
+            document.getElementById('modalGameOver').classList.add('hidden');
+            gameState.lives = 3;
+            loadLevel(gameState.currentLevel);
+            startTimer();
+        }
+
+        function finishWholeGame() {
+            pauseTimer();
+
+            let finalScore = Math.min(100, gameState.score);
+            if (gameState.wrongCount === 0) finalScore = 100;
+
+            gameState.score = finalScore;
+
+            document.getElementById('resName').textContent = gameState.student.name;
+            document.getElementById('resClass').textContent = gameState.student.class;
+            document.getElementById('resAbsen').textContent = gameState.student.absen;
+            document.getElementById('resTime').textContent = formatTime(gameState.timerSeconds);
+            document.getElementById('resScore').textContent = finalScore;
+            document.getElementById('resCorrect').textContent = gameState.correctCount;
+            document.getElementById('resWrong').textContent = gameState.wrongCount;
+            document.getElementById('resViolations').textContent = gameState.violations;
+
+            let gradeText = '';
+            let motivation = '';
+
+            if (finalScore >= 90) {
+                gradeText = 'Sangat Apik 🏆';
+                motivation = 'Luar biasa! Pangertenmu marang Aksara Jawa wis apik banget! 🏆';
+            } else if (finalScore >= 80) {
+                gradeText = 'Apik 👍';
+                motivation = 'Apik! Tinggal luwih teliti maneh bab pasangan lan sandhangan. 👍';
+            } else if (finalScore >= 70) {
+                gradeText = 'Cukup 📚';
+                motivation = 'Cukup apik. Ayo sinau maneh pasangan lan sandhangan kanthi sregep. 📚';
+            } else {
+                gradeText = 'Perlu Sinau Maneh 💪';
+                motivation = 'Aja nyerah! Sinau maneh lan coba maneh game iki. Semangat! 💪';
+            }
+
+            document.getElementById('resGrade').textContent = `${gradeText} (${finalScore})`;
+            document.getElementById('resMotivation').textContent = `"${motivation}"`;
+
+            const badgeContainer = document.getElementById('badgesContainer');
+            const allBadges = [
+                { name: 'Pangripta Aksara', icon: '🏅' },
+                { name: 'Wicaksana Aksara', icon: '🎖️' },
+                { name: 'Master Aksara Jawa', icon: '👑' }
+            ];
+
+            badgeContainer.innerHTML = allBadges.map(b => {
+                const isUnlocked = gameState.unlockedBadges.includes(b.name);
+                return `
+                    <div class="px-3 py-2 rounded-xl border ${isUnlocked ? 'bg-amber-100 border-amber-400 text-amber-900 shadow-sm' : 'bg-stone-100 border-stone-300 text-stone-400 opacity-60'} text-xs font-bold flex items-center gap-1.5">
+                        <span>${b.icon}</span>
+                        <span>${b.name}</span>
+                    </div>
+                `;
+            }).join('');
+
+            saveToTeacherLog();
+            showScreen('screenResult');
+            clearLocalStorage();
+        }
+
+        function sendWhatsAppResult() {
+            const timeStr = formatTime(gameState.timerSeconds);
+            const score = gameState.score;
+            let grade = 'Perlu Sinau Maneh';
+            if (score >= 90) grade = 'Sangat Apik';
+            else if (score >= 80) grade = 'Apik';
+            else if (score >= 70) grade = 'Cukup';
+
+            const message = `LAPORAN HASIL GAME AKSARA JAWA
+Nama: ${gameState.student.name}
+Kelas: ${gameState.student.class}
+No. Absen: ${gameState.student.absen}
+Skor Akhir: ${score}
+Grade: ${grade}
+Benar: ${gameState.correctCount}
+Salah: ${gameState.wrongCount}
+Pelanggaran: ${gameState.violations}
+Waktu Pengerjaan: ${timeStr}
+Game: Petualangan Aksara Jawa – Kelas XII
+Saya telah menyelesaikan game edukasi Aksara Jawa.`;
+
+            const encoded = encodeURIComponent(message);
+            const waUrl = `https://wa.me/${TEACHER_PHONE}?text=${encoded}`;
+            window.open(waUrl, '_blank');
+        }
+
+        function resetGameSession() {
+            clearLocalStorage();
+            location.reload();
+        }
+
+        function saveToTeacherLog() {
+            let logs = [];
+            try {
+                logs = JSON.parse(localStorage.getItem('aksara_teacher_logs') || '[]');
+            } catch(e) {}
+
+            const record = {
+                name: gameState.student.name,
+                class: gameState.student.class,
+                absen: gameState.student.absen,
+                score: gameState.score,
+                time: formatTime(gameState.timerSeconds),
+                violations: gameState.violations,
+                date: new Date().toLocaleString('id-ID')
+            };
+
+            logs.push(record);
+            localStorage.setItem('aksara_teacher_logs', JSON.stringify(logs));
+        }
+
+        function toggleTeacherModal() {
+            const modal = document.getElementById('modalTeacher');
+            if (modal.classList.contains('hidden')) {
+                renderTeacherTable();
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function renderTeacherTable() {
+            let logs = [];
+            try {
+                logs = JSON.parse(localStorage.getItem('aksara_teacher_logs') || '[]');
+            } catch(e) {}
+
+            const tbody = document.getElementById('teacherTableBody');
+            if (logs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-stone-400">Durung ana data siswa kang rampung.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = logs.map(l => {
+                let grade = l.score >= 90 ? 'Sangat Apik' : (l.score >= 80 ? 'Apik' : (l.score >= 70 ? 'Cukup' : 'Perlu Sinau'));
+                return `
+                    <tr class="border-b hover:bg-stone-50">
+                        <td class="p-2 font-semibold">${l.name}</td>
+                        <td class="p-2">${l.class}</td>
+                        <td class="p-2">${l.absen}</td>
+                        <td class="p-2 font-bold text-amber-700">${l.score}</td>
+                        <td class="p-2">${grade}</td>
+                        <td class="p-2 text-red-600 font-bold">${l.violations}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function clearTeacherLogs() {
+            if (confirm('Apakah Anda yakin ingin menghapus semua data rekap lokal Guru?')) {
+                localStorage.removeItem('aksara_teacher_logs');
+                renderTeacherTable();
+            }
+        }
+
+        function exportToCSV() {
+            let logs = [];
+            try {
+                logs = JSON.parse(localStorage.getItem('aksara_teacher_logs') || '[]');
+            } catch(e) {}
+
+            if (logs.length === 0) {
+                showCustomNotice('Data Kosong', 'Durung ana data rekap siswa kanggo di-download!', '⚠️');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,Nama,Kelas,No Absen,Skor,Waktu,Pelanggaran,Tanggal\n";
+            logs.forEach(l => {
+                csvContent += `"${l.name}","${l.class}","${l.absen}","${l.score}","${l.time}","${l.violations}","${l.date}"\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Rekap_Hasil_Aksara_Jawa_Kelas_XII.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
